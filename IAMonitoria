@@ -1,0 +1,1875 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <title>Atlas IA • Monitoria de Atendimentos</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <style>
+    :root {
+      --bg: #020617;
+      --bg-card: #020617;
+      --bg-card-inner: #020617;
+      --accent: #22c55e;
+      --accent-soft: rgba(34, 197, 94, 0.15);
+      --accent-strong: #4ade80;
+      --text: #e5e7eb;
+      --text-soft: #9ca3af;
+      --border: rgba(148, 163, 184, 0.3);
+      --border-strong: rgba(148, 163, 184, 0.6);
+      --danger: #f97373;
+      --shadow-soft: 0 40px 120px rgba(15, 23, 42, 1);
+      --radius-lg: 22px;
+      --radius-pill: 999px;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+
+    body {
+      min-height: 100vh;
+      background: radial-gradient(circle at top, #020617 0, #020617 35%, #000 100%);
+      color: var(--text);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 32px 16px;
+    }
+
+    .shell {
+      width: 100%;
+      max-width: 1180px;
+      border-radius: 32px;
+      padding: 1px;
+      background:
+        radial-gradient(circle at top left, rgba(34, 197, 94, 0.3), transparent 55%),
+        radial-gradient(circle at top right, rgba(59, 130, 246, 0.45), transparent 55%),
+        linear-gradient(135deg, #020617, #020617);
+      box-shadow: var(--shadow-soft);
+    }
+
+    .card {
+      background: radial-gradient(circle at top, #020617 0, #020617 40%, #020617 100%);
+      border-radius: 30px;
+      padding: 24px 28px 24px;
+      display: grid;
+      grid-template-columns: minmax(0, 1.15fr) minmax(0, 1.15fr);
+      gap: 22px;
+      border: 1px solid rgba(15, 23, 42, 0.9);
+    }
+
+    @media (max-width: 980px) {
+      .card {
+        grid-template-columns: minmax(0, 1fr);
+        padding: 20px 18px;
+      }
+    }
+
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 18px;
+      gap: 14px;
+    }
+
+    .title-block {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .title-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .brand-logo {
+      width: 36px;
+      height: 36px;
+      border-radius: 999px;
+    }
+
+    .title-block h1 {
+      font-size: 1rem;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      color: #e5e7eb;
+      font-weight: 500;
+      opacity: 0.9;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont,
+                   "Segoe UI", sans-serif;
+    }
+
+    @media (min-width: 1200px) {
+      .title-block h1 {
+        font-size: 1.05rem;
+      }
+    }
+
+    .title-block p {
+      font-size: 0.82rem;
+      color: var(--text-soft);
+      margin-top: 2px;
+    }
+
+    .chip-right {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 14px;
+      border-radius: var(--radius-pill);
+      background: rgba(15, 23, 42, 0.9);
+      border: 1px solid rgba(148, 163, 184, 0.45);
+      font-size: 0.72rem;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      color: var(--text-soft);
+    }
+
+    .chip-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 999px;
+      background: #22c55e;
+      box-shadow: 0 0 0 4px rgba(34, 197, 94, 0.25);
+    }
+
+    .panel {
+      border-radius: 22px;
+      background: radial-gradient(circle at top left, rgba(15, 23, 42, 0.98), rgba(15, 23, 42, 0.96));
+      border: 1px solid rgba(55, 65, 81, 0.95);
+      padding: 18px 18px 16px;
+    }
+
+    .panel-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 10px;
+      margin-bottom: 14px;
+    }
+
+    .panel-title {
+      font-size: 0.86rem;
+      text-transform: uppercase;
+      letter-spacing: 0.14em;
+      color: var(--text-soft);
+    }
+
+    .panel-subtitle {
+      margin-top: 4px;
+      font-size: 0.8rem;
+      color: var(--text-soft);
+    }
+
+    .small-pill {
+      font-size: 0.72rem;
+      padding: 6px 12px;
+      border-radius: var(--radius-pill);
+      border: 1px solid rgba(148, 163, 184, 0.6);
+      color: var(--text-soft);
+      background: rgba(15, 23, 42, 0.75);
+      white-space: nowrap;
+    }
+
+    button.small-pill {
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+    }
+
+    .small-pill-link:hover {
+      border-color: var(--accent);
+      color: var(--accent-strong);
+      box-shadow: 0 0 0 1px rgba(34, 197, 94, 0.35);
+    }
+
+    .panel-header-actions {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      align-items: flex-end;
+    }
+
+    .form {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .field-row {
+      display: grid;
+      grid-template-columns: minmax(0, 1.1fr) minmax(0, 1.1fr);
+      gap: 12px;
+    }
+
+    @media (max-width: 640px) {
+      .field-row {
+        grid-template-columns: minmax(0, 1fr);
+      }
+    }
+
+    label {
+      display: block;
+      font-size: 0.8rem;
+      margin-bottom: 4px;
+      color: var(--text-soft);
+    }
+
+    .label-extra {
+      font-size: 0.72rem;
+      color: #6b7280;
+      margin-left: 4px;
+    }
+
+    input[type="text"] {
+      width: 100%;
+      padding: 10px 11px;
+      border-radius: 12px;
+      border: 1px solid rgba(55, 65, 81, 0.9);
+      background: rgba(15, 23, 42, 0.9);
+      color: var(--text);
+      font-size: 0.86rem;
+      outline: none;
+      transition: border 0.14s ease, box-shadow 0.14s ease, background 0.14s ease;
+    }
+
+    input[type="text"]::placeholder {
+      color: #4b5563;
+    }
+
+    input[type="text"]:focus {
+      border-color: var(--accent);
+      background: #020617;
+      box-shadow: 0 0 0 1px rgba(34, 197, 94, 0.45);
+    }
+
+    .dropzone {
+      border-radius: 16px;
+      border: 1px dashed rgba(148, 163, 184, 0.7);
+      background: radial-gradient(circle at top left, rgba(15, 23, 42, 0.98), rgba(15, 23, 42, 0.96));
+      padding: 16px 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      cursor: pointer;
+      transition: border 0.15s ease, background 0.15s ease, transform 0.08s ease;
+    }
+
+    .dropzone:hover {
+      border-color: var(--accent-strong);
+      transform: translateY(-1px);
+    }
+
+    .dropzone.dragover {
+      border-color: var(--accent-strong);
+      box-shadow: 0 0 0 1px rgba(34, 197, 94, 0.55);
+    }
+
+    .drop-main {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .drop-main > div {
+      min-width: 0;
+    }
+
+    .drop-icon {
+      width: 32px;
+      height: 32px;
+      border-radius: 999px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: radial-gradient(circle at top left, rgba(34, 197, 94, 0.25), transparent 60%);
+      font-size: 1.2rem;
+      color: var(--accent-strong);
+    }
+
+    .drop-text-primary {
+      font-size: 0.85rem;
+      color: var(--text);
+    }
+
+    .drop-text-secondary {
+      font-size: 0.78rem;
+      color: var(--text-soft);
+    }
+
+    .drop-file {
+      font-size: 0.78rem;
+      color: var(--accent-strong);
+      display: block;
+      max-width: 100%;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .hidden-input {
+      display: none;
+    }
+
+    .actions {
+      display: flex;
+      align-items: center;
+      justify-content: flex-start;
+      gap: 14px;
+      margin-top: 8px;
+      flex-wrap: wrap;
+    }
+
+    .primary-btn {
+      border: none;
+      border-radius: 999px;
+      padding: 12px 32px;
+      font-size: 0.9rem;
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      cursor: pointer;
+      color: #022c22;
+      background: radial-gradient(circle at top left, #4ade80, #16a34a);
+      box-shadow: 0 24px 60px rgba(22, 163, 74, 0.5);
+      transition: transform 0.12s ease, box-shadow 0.12s ease, filter 0.12s ease;
+    }
+
+    .primary-btn:hover {
+      transform: translateY(-1px);
+      filter: brightness(1.04);
+      box-shadow: 0 26px 65px rgba(21, 128, 61, 0.7);
+    }
+
+    .primary-btn:disabled {
+      opacity: 0.65;
+      cursor: default;
+      transform: none;
+      box-shadow: none;
+    }
+
+    .secondary-btn {
+      border-radius: 999px;
+      padding: 8px 18px;
+      font-size: 0.78rem;
+      border: 1px solid rgba(148, 163, 184, 0.6);
+      background: rgba(15, 23, 42, 0.9);
+      color: var(--text-soft);
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    .secondary-btn.small {
+      padding: 6px 12px;
+      font-size: 0.76rem;
+    }
+
+    .secondary-btn:hover {
+      border-color: var(--accent);
+      color: var(--accent-strong);
+    }
+
+    .spinner {
+      width: 16px;
+      height: 16px;
+      border-radius: 999px;
+      border: 2px solid rgba(15, 23, 42, 0.35);
+      border-top-color: rgba(15, 23, 42, 0.9);
+      animation: spin 0.7s linear infinite;
+    }
+
+    @keyframes spin {
+      to {
+        transform: rotate(360deg);
+      }
+    }
+
+    .hint {
+      font-size: 0.74rem;
+      color: var(--text-soft);
+      max-width: 280px;
+    }
+
+    .status {
+      margin-top: 10px;
+      min-height: 18px;
+      font-size: 0.78rem;
+    }
+
+    .status.neutral { color: var(--text-soft); }
+    .status.success { color: #4ade80; }
+    .status.error { color: var(--danger); }
+
+    .summary-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-bottom: 6px;
+    }
+
+    .summary-pill {
+      padding: 6px 10px;
+      border-radius: 999px;
+      border: 1px solid rgba(55, 65, 81, 0.9);
+      background: rgba(15, 23, 42, 0.9);
+      font-size: 0.75rem;
+      color: var(--text-soft);
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .summary-label { color: #6b7280; }
+    .summary-value { color: #e5e7eb; }
+
+    .agent-badge {
+      margin-top: 2px;
+      font-size: 0.72rem;
+      padding: 4px 10px;
+      border-radius: 999px;
+      border: 1px solid rgba(55, 65, 81, 0.9);
+      background: rgba(15, 23, 42, 0.9);
+      color: #e5e7eb;
+      display: none;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .agent-badge--top {
+      border-color: #4ade80;
+      background: rgba(22, 163, 74, 0.18);
+      color: #bbf7d0;
+    }
+
+    .agent-badge--mid {
+      border-color: rgba(148, 163, 184, 0.7);
+      background: rgba(15, 23, 42, 0.95);
+      color: #e5e7eb;
+    }
+
+    .agent-badge--low {
+      border-color: #f97373;
+      background: rgba(248, 113, 113, 0.15);
+      color: #fecaca;
+    }
+
+    .score-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 10px;
+      margin-top: 6px;
+    }
+
+    @media (max-width: 640px) {
+      .score-grid {
+        grid-template-columns: minmax(0, 1fr);
+      }
+    }
+
+    .score-card {
+      border-radius: 14px;
+      padding: 10px 12px;
+      border: 1px solid rgba(55, 65, 81, 0.95);
+      background: radial-gradient(circle at top, rgba(15, 23, 42, 0.98), rgba(15, 23, 42, 0.96));
+      font-size: 0.8rem;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      transition: border 0.18s ease, box-shadow 0.18s ease, transform 0.12s ease;
+    }
+
+    .score-card--high {
+      border-color: rgba(34, 197, 94, 0.95);
+      box-shadow: 0 0 0 1px rgba(34, 197, 94, 0.4);
+      transform: translateY(-1px);
+    }
+
+    .score-card--medium {
+      border-color: rgba(234, 179, 8, 0.9);
+      box-shadow: 0 0 0 1px rgba(234, 179, 8, 0.35);
+    }
+
+    .score-card--low {
+      border-color: rgba(248, 113, 113, 0.95);
+      box-shadow: 0 0 0 1px rgba(248, 113, 113, 0.3);
+    }
+
+    .score-label {
+      color: var(--text-soft);
+      text-transform: uppercase;
+      letter-spacing: 0.09em;
+      font-size: 0.68rem;
+      font-weight: 600;
+    }
+
+    .score-value {
+      font-size: 1.1rem;
+      font-weight: 600;
+      color: #f9fafb;
+    }
+
+    .score-caption {
+      font-size: 0.75rem;
+      color: var(--text-soft);
+    }
+
+    .block {
+      border-radius: 14px;
+      border: 1px solid rgba(55, 65, 81, 0.95);
+      background: radial-gradient(circle at top, rgba(15, 23, 42, 0.98), rgba(15, 23, 42, 0.96));
+      padding: 10px 12px;
+      margin-top: 8px;
+      font-size: 0.78rem;
+      color: var(--text-soft);
+    }
+
+    .block strong {
+      color: #e5e7eb;
+      font-weight: 500;
+    }
+
+    .highlight-snippet {
+      color: #4ade80;
+      font-weight: 500;
+    }
+
+    .footnote {
+      margin-top: 10px;
+      font-size: 0.72rem;
+      color: #6b7280;
+    }
+
+    .dashboard-panel {
+      margin-top: 12px;
+      border-radius: 16px;
+      border: 1px solid rgba(55, 65, 81, 0.95);
+      background: radial-gradient(circle at top, rgba(15, 23, 42, 0.98), rgba(15, 23, 42, 0.96));
+      padding: 10px 12px 10px;
+      max-height: 650px;
+      overflow: hidden;
+      opacity: 1;
+      transform: translateY(0);
+      transition: max-height 0.35s ease, opacity 0.25s ease, transform 0.25s ease, padding 0.25s ease, margin-top 0.25s ease, border-width 0.25s ease;
+    }
+
+    .dashboard-panel.pulse {
+      box-shadow: 0 0 0 1px rgba(34, 197, 94, 0.65);
+    }
+
+    .dashboard-panel.collapsed {
+      max-height: 0;
+      opacity: 0;
+      transform: translateY(-6px);
+      padding-top: 0;
+      padding-bottom: 0;
+      margin-top: 0;
+      border-width: 0;
+    }
+
+    .dashboard-header {
+      margin-bottom: 6px;
+    }
+
+    .dashboard-title {
+      font-size: 0.78rem;
+      text-transform: uppercase;
+      letter-spacing: 0.14em;
+      color: var(--text-soft);
+    }
+
+    .dashboard-subtitle {
+      font-size: 0.76rem;
+      color: #9ca3af;
+      margin-top: 2px;
+    }
+
+    .dashboard-grid {
+      display: grid;
+      grid-template-columns: 2fr 1.3fr 1.3fr;
+      gap: 10px;
+      margin-top: 6px;
+    }
+
+    @media (max-width: 900px) {
+      .dashboard-grid {
+        grid-template-columns: minmax(0, 1fr);
+      }
+    }
+
+    .mini-card {
+      border-radius: 12px;
+      border: 1px solid rgba(55, 65, 81, 0.95);
+      background: rgba(15, 23, 42, 0.98);
+      padding: 8px 9px;
+    }
+
+    .mini-title {
+      font-size: 0.78rem;
+      color: var(--text-soft);
+      margin-bottom: 4px;
+    }
+
+    .mini-bars {
+      margin-top: 4px;
+    }
+
+    .mini-bar-row {
+      display: grid;
+      grid-template-columns: auto 1fr auto;
+      gap: 6px;
+      align-items: center;
+      font-size: 0.76rem;
+      margin-bottom: 4px;
+    }
+
+    .mini-bar-label {
+      color: var(--text-soft);
+      white-space: nowrap;
+    }
+
+    .mini-bar-track {
+      height: 8px;
+      border-radius: 999px;
+      background: rgba(31, 41, 55, 1);
+      overflow: hidden;
+    }
+
+    .mini-bar-fill {
+      height: 100%;
+      border-radius: 999px;
+      background: linear-gradient(90deg, #22c55e, #4ade80);
+      width: 0%;
+      transition: width 0.3s ease;
+    }
+
+    .mini-bar-fill.alt {
+      background: linear-gradient(90deg, #38bdf8, #818cf8);
+    }
+
+    .mini-bar-fill.exp {
+      background: linear-gradient(90deg, #f97316, #facc15);
+    }
+
+    .mini-bar-value {
+      font-size: 0.75rem;
+      color: #e5e7eb;
+    }
+
+    .mini-footnote {
+      margin-top: 6px;
+      font-size: 0.7rem;
+      color: #6b7280;
+    }
+
+    .donut-wrapper {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-top: 4px;
+    }
+
+    .donut {
+      --cpc-stop: 50%;
+      position: relative;
+      width: 70px;
+      height: 70px;
+      border-radius: 50%;
+      background: conic-gradient(
+        #22c55e 0 var(--cpc-stop),
+        rgba(55, 65, 81, 1) var(--cpc-stop) 100%
+      );
+    }
+
+    .donut::after {
+      content: "";
+      position: absolute;
+      inset: 16px;
+      border-radius: 50%;
+      background: rgba(15, 23, 42, 1);
+    }
+
+    .donut-center {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.72rem;
+      font-weight: 500;
+      color: #e5e7eb;
+    }
+
+    .donut-legend {
+      font-size: 0.72rem;
+      color: var(--text-soft);
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 999px;
+      display: inline-block;
+      margin-right: 4px;
+    }
+
+    .dot-cpc {
+      background: #22c55e;
+    }
+
+    .dot-ncpc {
+      background: #6b7280;
+    }
+
+    .history-panel {
+      margin-top: 10px;
+      border-top: 1px solid rgba(31, 41, 55, 1);
+      padding-top: 6px;
+    }
+
+    .history-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      font-size: 0.76rem;
+      color: var(--text-soft);
+      margin-bottom: 4px;
+    }
+
+    .history-caption {
+      font-size: 0.7rem;
+      color: #6b7280;
+    }
+
+    .history-table {
+      font-size: 0.74rem;
+    }
+
+    .history-row {
+      display: grid;
+      grid-template-columns: 1.4fr 1.2fr 0.7fr 0.9fr;
+      gap: 6px;
+      padding: 2px 0;
+    }
+
+    .history-header-row {
+      font-weight: 500;
+      color: #d1d5db;
+      border-bottom: 1px solid rgba(31, 41, 55, 1);
+      margin-bottom: 2px;
+      padding-bottom: 3px;
+    }
+
+    .history-empty {
+      font-size: 0.74rem;
+      color: #6b7280;
+    }
+
+    .transcription-panel {
+      margin-top: 10px;
+      border-radius: 14px;
+      border: 1px solid rgba(55, 65, 81, 0.95);
+      background: radial-gradient(circle at top, rgba(15, 23, 42, 0.98), rgba(15, 23, 42, 0.96));
+      padding: 10px 12px 10px;
+      max-height: 340px;
+      overflow: auto;
+      opacity: 1;
+      transform: translateY(0);
+      transition: max-height 0.35s ease, opacity 0.25s ease, transform 0.25s ease, padding 0.25s ease, margin-top 0.25s ease, border-width 0.25s ease;
+      font-size: 0.78rem;
+      color: var(--text-soft);
+    }
+
+    .transcription-panel.collapsed {
+      max-height: 0;
+      opacity: 0;
+      transform: translateY(-6px);
+      padding-top: 0;
+      padding-bottom: 0;
+      margin-top: 0;
+      border-width: 0;
+      overflow: hidden;
+    }
+
+    .transcription-title {
+      font-size: 0.78rem;
+      text-transform: uppercase;
+      letter-spacing: 0.14em;
+      color: var(--text-soft);
+      margin-bottom: 2px;
+    }
+
+    .transcription-subtitle {
+      font-size: 0.74rem;
+      color: #9ca3af;
+      margin-bottom: 6px;
+    }
+
+    .transcription-body {
+      font-size: 0.78rem;
+      line-height: 1.5;
+      color: var(--text-soft);
+      white-space: pre-wrap;
+    }
+
+    .reports-panel {
+      margin-top: 14px;
+      border-radius: 14px;
+      border: 1px solid rgba(55, 65, 81, 0.75);
+      background: rgba(15, 23, 42, 0.92);
+      padding: 12px 10px 14px;
+      text-align: center;
+    }
+
+    .reports-header.centered {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 2px;
+      margin-bottom: 8px;
+    }
+
+    .reports-title.small {
+      font-size: 0.74rem;
+      text-transform: uppercase;
+      letter-spacing: 0.16em;
+      color: var(--text-soft);
+    }
+
+    .reports-subtitle.tiny {
+      font-size: 0.68rem;
+      color: #6b7280;
+    }
+
+    .reports-actions.centered {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 8px;
+      padding-top: 6px;
+    }
+
+    @media (max-width: 720px) {
+      .reports-actions.centered {
+        grid-template-columns: minmax(0, 1fr);
+      }
+    }
+
+    .report-btn {
+      padding: 6px 12px;
+      font-size: 0.68rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      border-radius: 999px;
+      border: 1px solid rgba(148, 163, 184, 0.5);
+      background: rgba(15, 23, 42, 0.75);
+      color: var(--text-soft);
+      cursor: pointer;
+      transition: 0.12s ease;
+      width: 100%;
+    }
+
+    .report-btn:hover {
+      border-color: var(--accent);
+      color: var(--accent-strong);
+    }
+  </style>
+</head>
+<body>
+  <main class="shell">
+    <section class="card">
+      <div class="panel">
+        <header class="header">
+          <div class="title-block">
+            <div class="title-row">
+              <img src="Grupo Asserth.png" alt="Grupo Asserth" class="brand-logo" />
+              <div>
+                <h1>Atlas IA • Monitoria de Atendimentos</h1>
+                <p>Envie a gravação e receba um parecer técnico estruturado em poucos minutos.</p>
+              </div>
+            </div>
+          </div>
+          <div class="chip-right">
+            <span class="chip-dot"></span>
+            <span>ATIVO</span>
+          </div>
+        </header>
+
+        <div class="panel-header" style="margin-bottom: 12px;">
+          <div>
+            <div class="panel-title">Análise de ligação com IA</div>
+            <p class="panel-subtitle">
+              Faça upload da gravação e informe os dados mínimos para registrar a monitoria.
+            </p>
+          </div>
+          <div class="panel-header-actions">
+            <button type="button" class="small-pill small-pill-link" id="goDashboardBtn">
+              aparece no dashboard
+            </button>
+            <button type="button" class="small-pill small-pill-link" id="toggleTranscriptionBtn">
+              ver transcrição
+            </button>
+          </div>
+        </div>
+
+        <form id="uploadForm" class="form">
+          <div class="field-row">
+            <div>
+              <label for="callId">
+                Telefone
+                <span class="label-extra">obrigatório</span>
+              </label>
+              <input
+                type="text"
+                id="callId"
+                name="callId"
+                placeholder="Ex.: 11999999999"
+                autocomplete="off"
+                required
+              />
+            </div>
+            <div>
+              <label for="teamMember">
+                Agente / operador
+                <span class="label-extra">obrigatório</span>
+              </label>
+              <input
+                type="text"
+                id="teamMember"
+                name="teamMember"
+                placeholder="Nome do agente"
+                autocomplete="off"
+                required
+              />
+            </div>
+          </div>
+
+          <input type="hidden" id="fileName" name="fileName" />
+
+          <div>
+            <label>Gravação do atendimento <span class="label-extra">áudio ou vídeo</span></label>
+            <div id="dropzone" class="dropzone">
+              <div class="drop-main">
+                <div class="drop-icon">⬆️</div>
+                <div>
+                  <div class="drop-text-primary">
+                    Arraste o arquivo aqui ou clique para selecionar
+                  </div>
+                  <div class="drop-text-secondary">
+                    Formatos aceitos: <strong>mp3, wav, m4a, mp4, mov</strong> · máx. ~50 MB
+                  </div>
+                  <div id="fileInfo" class="drop-file"></div>
+                </div>
+              </div>
+              <input
+                id="fileInput"
+                class="hidden-input"
+                type="file"
+                accept="audio/*,video/*"
+              />
+            </div>
+          </div>
+
+          <div class="actions">
+            <button type="submit" id="submitBtn" class="primary-btn">
+              <span id="btnLabel">Rodar análise da ligação</span>
+              <span id="btnSpinner" class="spinner" style="display:none;"></span>
+            </button>
+
+            <button type="button" id="refreshBtn" class="secondary-btn">
+              ↻ Atualizar resultado
+            </button>
+
+            <p class="hint">
+              A transcrição, o score, o CPC e os principais achados serão gravados na planilha
+              <strong>Monitoria IA</strong> e, a partir dela, atualizam o dashboard em Power BI.
+            </p>
+          </div>
+
+          <div id="status" class="status neutral"></div>
+        </form>
+      </div>
+
+      <div class="panel">
+        <div class="panel-header">
+          <div>
+            <div class="panel-title">Resultado técnico da monitoria</div>
+            <p class="panel-subtitle">
+              Última gravação analisada em <span id="lastUpdated">–</span>
+            </p>
+          </div>
+          <div class="small-pill" id="tipoOperacaoPill">
+            Tipo de operação: <span id="tipo_operacao_valor">–</span>
+          </div>
+        </div>
+
+        <div class="summary-row">
+          <div class="summary-pill">
+            <span class="summary-label">Agente:</span>
+            <span id="agente_nome" class="summary-value">–</span>
+          </div>
+          <div class="summary-pill">
+            <span class="summary-label">Cliente:</span>
+            <span id="cliente_nome" class="summary-value">–</span>
+          </div>
+          <div class="summary-pill">
+            <span class="summary-label">CPC:</span>
+            <span id="cpc_valor" class="summary-value">–</span>
+          </div>
+          <div class="summary-pill">
+            <span class="summary-label">Duração:</span>
+            <span id="duracao_valor" class="summary-value">–</span>
+          </div>
+          <div class="summary-pill">
+            <span class="summary-label">Emoção cliente:</span>
+            <span id="emocao_cliente_valor" class="summary-value">–</span>
+          </div>
+          <div class="summary-pill">
+            <span class="summary-label">Postura agente:</span>
+            <span id="postura_agente_valor" class="summary-value">–</span>
+          </div>
+        </div>
+
+        <div id="agente_badge" class="agent-badge"></div>
+
+        <div class="score-grid">
+          <div class="score-card" data-score-card="geral">
+            <div class="score-label">Score geral</div>
+            <div id="score_geral" class="score-value">–</div>
+            <div class="score-caption">Notas de 0 a 100 sobre a qualidade global da ligação.</div>
+          </div>
+          <div class="score-card" data-score-card="roteiro">
+            <div class="score-label">Score de roteiro</div>
+            <div id="score_roteiro_valor" class="score-value">–</div>
+            <div class="score-caption">Aderência ao script e aos pontos obrigatórios.</div>
+          </div>
+          <div class="score-card" data-score-card="experiencia">
+            <div class="score-label">Score de experiência</div>
+            <div id="score_experiencia_valor" class="score-value">–</div>
+            <div class="score-caption">Percepção de experiência do cliente final.</div>
+          </div>
+        </div>
+
+        <div class="block">
+          <strong>Pontos positivos:</strong>
+          <span id="pontos_positivos_texto">
+            Nenhuma análise carregada ainda. Após o primeiro upload, os acertos do atendimento aparecem aqui.
+          </span>
+        </div>
+
+        <div class="block">
+          <strong>Pontos de melhoria:</strong>
+          <span id="pontos_melhoria_texto">
+            Serão destacados os principais gaps de roteiro, abordagem e experiência do cliente.
+          </span>
+        </div>
+
+        <div class="block">
+          <strong>Resumo técnico da ligação:</strong>
+          <span id="resumo_tecnico_texto">
+            Assim que a IA concluir a análise, você verá um resumo executivo da interação, pronto para ser usado na monitoria.
+          </span>
+        </div>
+
+        <div id="dashboardSection" class="dashboard-panel collapsed">
+          <div class="dashboard-header">
+            <div class="dashboard-title">Visão gráfica da monitoria</div>
+            <div class="dashboard-subtitle">
+              Visualização rápida dos principais indicadores desta ligação e histórico recente.
+            </div>
+          </div>
+
+          <div class="dashboard-grid">
+            <div class="mini-card">
+              <div class="mini-title">Scores da ligação</div>
+              <div class="mini-bars">
+                <div class="mini-bar-row">
+                  <span class="mini-bar-label">Geral</span>
+                  <div class="mini-bar-track">
+                    <div id="bar_score_geral" class="mini-bar-fill"></div>
+                  </div>
+                  <span class="mini-bar-value" id="bar_score_geral_label">–</span>
+                </div>
+                <div class="mini-bar-row">
+                  <span class="mini-bar-label">Roteiro</span>
+                  <div class="mini-bar-track">
+                    <div id="bar_score_roteiro" class="mini-bar-fill alt"></div>
+                  </div>
+                  <span class="mini-bar-value" id="bar_score_roteiro_label">–</span>
+                </div>
+                <div class="mini-bar-row">
+                  <span class="mini-bar-label">Experiência</span>
+                  <div class="mini-bar-track">
+                    <div id="bar_score_experiencia" class="mini-bar-fill exp"></div>
+                  </div>
+                  <span class="mini-bar-value" id="bar_score_experiencia_label">–</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="mini-card">
+              <div class="mini-title">CPC x Não CPC (histórico)</div>
+              <div class="donut-wrapper">
+                <div class="donut" id="donut_cpc">
+                  <div class="donut-center" id="donut_center_label">–</div>
+                </div>
+                <div class="donut-legend">
+                  <div><span class="dot dot-cpc"></span><span id="donut_cpc_label">CPC: –</span></div>
+                  <div><span class="dot dot-ncpc"></span><span id="donut_ncpc_label">Não CPC / ind.: –</span></div>
+                </div>
+              </div>
+            </div>
+
+            <div class="mini-card">
+              <div class="mini-title">Duração (minutos)</div>
+              <div class="mini-bars">
+                <div class="mini-bar-row">
+                  <span class="mini-bar-label">Ligação</span>
+                  <div class="mini-bar-track">
+                    <div id="bar_duracao" class="mini-bar-fill"></div>
+                  </div>
+                  <span class="mini-bar-value" id="bar_duracao_label">–</span>
+                </div>
+              </div>
+              <p class="mini-footnote">
+                Escala automática até ~15 minutos. Baseada na duração transcrita.
+              </p>
+            </div>
+          </div>
+
+          <div class="history-panel">
+            <div class="history-header">
+              <span>Histórico recente</span>
+              <span class="history-caption">(últimas 5 análises neste navegador)</span>
+            </div>
+            <div id="historyTable" class="history-table">
+              <div class="history-empty">Ainda não há histórico suficiente para exibir.</div>
+            </div>
+          </div>
+        </div>
+
+        <div id="transcriptionSection" class="transcription-panel collapsed">
+          <div class="transcription-title">Transcrição completa</div>
+          <div class="transcription-subtitle">
+            Texto integral da ligação, para consulta detalhada pelo supervisor.
+          </div>
+          <div id="transcricao_completa_texto" class="transcription-body">
+            Transcrição não disponível para esta ligação.
+          </div>
+        </div>
+
+        <div class="reports-panel">
+          <div class="reports-header centered">
+            <span class="reports-title small">Relatórios</span>
+          </div>
+          <div class="reports-actions centered">
+            <button type="button" id="btnExportExcel" class="report-btn">Excel (.xls)</button>
+            <button type="button" id="btnExportCsv" class="report-btn">CSV</button>
+            <button type="button" id="btnExportPdf" class="report-btn">PDF</button>
+          </div>
+        </div>
+
+        <p class="footnote">
+          * Os resultados são indicativos e dependem da qualidade da gravação e da transcrição.
+        </p>
+      </div>
+    </section>
+  </main>
+
+  <script>
+    const N8N_WEBHOOK_POST = "https://n8n.srv1000187.hstgr.cloud/webhook/monitoria-ia";
+    const N8N_WEBHOOK_GET_ULTIMA = "https://n8n.srv1000187.hstgr.cloud/webhook/monitoria-ia-resultado";
+    const HISTORY_KEY = "atlas_monitoria_history_v1";
+
+    const form = document.getElementById("uploadForm");
+    const dropzone = document.getElementById("dropzone");
+    const fileInput = document.getElementById("fileInput");
+    const fileInfo = document.getElementById("fileInfo");
+    const statusEl = document.getElementById("status");
+    const submitBtn = document.getElementById("submitBtn");
+    const btnLabel = document.getElementById("btnLabel");
+    const btnSpinner = document.getElementById("btnSpinner");
+    const refreshBtn = document.getElementById("refreshBtn");
+    const goDashboardBtn = document.getElementById("goDashboardBtn");
+    const toggleTranscriptionBtn = document.getElementById("toggleTranscriptionBtn");
+    const dashboardSection = document.getElementById("dashboardSection");
+    const transcriptionSection = document.getElementById("transcriptionSection");
+    const transcricaoTextoEl = document.getElementById("transcricao_completa_texto");
+    const btnExportExcel = document.getElementById("btnExportExcel");
+    const btnExportCsv = document.getElementById("btnExportCsv");
+    const btnExportPdf = document.getElementById("btnExportPdf");
+
+    let selectedFile = null;
+    let lastAnalysis = null;
+    let dashboardVisible = false;
+    let transcriptionVisible = false;
+
+    function setStatus(msg, type = "neutral") {
+      statusEl.textContent = msg;
+      statusEl.className = "status " + type;
+    }
+
+    function setLoading(isLoading) {
+      submitBtn.disabled = isLoading;
+      btnSpinner.style.display = isLoading ? "inline-block" : "none";
+      btnLabel.textContent = isLoading ? "Enviando..." : "Rodar análise da ligação";
+    }
+
+    function handleFile(file) {
+      if (!file) return;
+      selectedFile = file;
+      const sizeMB = file.size ? (file.size / (1024 * 1024)).toFixed(2) : "–";
+      fileInfo.textContent = `${file.name} (${sizeMB} MB)`;
+      setStatus("Arquivo pronto para envio.", "neutral");
+    }
+
+    dropzone.addEventListener("click", () => fileInput.click());
+    fileInput.addEventListener("change", (e) => handleFile(e.target.files[0]));
+
+    dropzone.addEventListener("dragover", (e) => {
+      e.preventDefault();
+      dropzone.classList.add("dragover");
+    });
+
+    dropzone.addEventListener("dragleave", (e) => {
+      e.preventDefault();
+      dropzone.classList.remove("dragover");
+    });
+
+    dropzone.addEventListener("drop", (e) => {
+      e.preventDefault();
+      dropzone.classList.remove("dragover");
+      const file = e.dataTransfer.files && e.dataTransfer.files[0];
+      handleFile(file);
+    });
+
+    if (goDashboardBtn && dashboardSection) {
+      goDashboardBtn.addEventListener("click", () => {
+        dashboardVisible = !dashboardVisible;
+        dashboardSection.classList.toggle("collapsed", !dashboardVisible);
+
+        if (dashboardVisible) {
+          dashboardSection.scrollIntoView({ behavior: "smooth", block: "start" });
+          dashboardSection.classList.add("pulse");
+          setTimeout(() => dashboardSection.classList.remove("pulse"), 800);
+        }
+      });
+    }
+
+    if (toggleTranscriptionBtn && transcriptionSection) {
+      toggleTranscriptionBtn.addEventListener("click", () => {
+        transcriptionVisible = !transcriptionVisible;
+        transcriptionSection.classList.toggle("collapsed", !transcriptionVisible);
+
+        if (transcriptionVisible) {
+          transcriptionSection.scrollIntoView({ behavior: "smooth", block: "start" });
+        }
+      });
+    }
+
+    form.addEventListener("submit", async (e) => {
+      e.preventDefault();
+
+      const callId = document.getElementById("callId").value.trim();
+      const teamMember = document.getElementById("teamMember").value.trim();
+
+      if (!callId) {
+        setStatus("Informe o telefone.", "error");
+        return;
+      }
+      if (!teamMember) {
+        setStatus("Informe o nome do agente (teamMember).", "error");
+        return;
+      }
+      if (!selectedFile) {
+        setStatus("Selecione uma gravação de áudio ou vídeo.", "error");
+        return;
+      }
+
+      const allowedExt = ["mp3", "wav", "m4a", "mp4", "mov"];
+      const ext = (selectedFile.name.split(".").pop() || "").toLowerCase();
+      if (!allowedExt.includes(ext)) {
+        setStatus("Formato não suportado. Use mp3, wav, m4a, mp4 ou mov.", "error");
+        return;
+      }
+
+      setLoading(true);
+      setStatus("Enviando gravação para o n8n e iniciando análise...", "neutral");
+
+      try {
+        const formData = new FormData();
+        formData.append("callId", callId);
+        formData.append("teamMember", teamMember);
+        formData.append("fileName", selectedFile.name);
+        formData.append("file", selectedFile);
+
+        const response = await fetch(N8N_WEBHOOK_POST, {
+          method: "POST",
+          body: formData
+        });
+
+        let message = "";
+        try {
+          const data = await response.json();
+          message = data.message || JSON.stringify(data);
+        } catch {
+          message = response.ok
+            ? "Workflow iniciado com sucesso."
+            : "Erro ao interpretar resposta do servidor.";
+        }
+
+        if (!response.ok) {
+          throw new Error(message || "Falha ao enviar para o webhook.");
+        }
+
+        setStatus("Análise iniciada com sucesso. Aguarde alguns instantes e clique em 'Atualizar resultado'.", "success");
+
+      } catch (err) {
+        console.error(err);
+        setStatus("Erro ao enviar para o n8n: " + (err.message || "Failed to fetch"), "error");
+      } finally {
+        setLoading(false);
+      }
+    });
+
+    function formatLabel(value) {
+      if (!value || value === "–") return value;
+      return String(value).replace(/_/g, " ");
+    }
+
+    function normalizeScore(val) {
+      const n = Number(val);
+      if (isNaN(n)) return 0;
+      return Math.max(0, Math.min(100, n));
+    }
+
+    function parseDurationMinutes(text) {
+      if (!text) return 0;
+      const m = String(text).match(/(\d+):(\d+)/);
+      if (!m) return 0;
+      const min = parseInt(m[1], 10) || 0;
+      const sec = parseInt(m[2], 10) || 0;
+      return min + sec / 60;
+    }
+
+    function applyScoreStyle(card, val) {
+      if (!card) return;
+      card.classList.remove("score-card--high", "score-card--medium", "score-card--low");
+      const n = Number(val);
+      if (isNaN(n)) return;
+      if (n >= 80) card.classList.add("score-card--high");
+      else if (n >= 60) card.classList.add("score-card--medium");
+      else card.classList.add("score-card--low");
+    }
+
+    function updateCharts(metrics) {
+      const geral = normalizeScore(metrics.score);
+      const rot = normalizeScore(metrics.score_roteiro);
+      const exp = normalizeScore(metrics.score_experiencia);
+
+      const barGeral = document.getElementById("bar_score_geral");
+      const barRot = document.getElementById("bar_score_roteiro");
+      const barExp = document.getElementById("bar_score_experiencia");
+
+      if (barGeral) barGeral.style.width = geral + "%";
+      if (barRot) barRot.style.width = rot + "%";
+      if (barExp) barExp.style.width = exp + "%";
+
+      const lblGeral = document.getElementById("bar_score_geral_label");
+      const lblRot = document.getElementById("bar_score_roteiro_label");
+      const lblExp = document.getElementById("bar_score_experiencia_label");
+      if (lblGeral) lblGeral.textContent = isNaN(geral) ? "–" : geral.toFixed(0);
+      if (lblRot) lblRot.textContent = isNaN(rot) ? "–" : rot.toFixed(0);
+      if (lblExp) lblExp.textContent = isNaN(exp) ? "–" : exp.toFixed(0);
+
+      applyScoreStyle(document.querySelector('[data-score-card="geral"]'), geral);
+      applyScoreStyle(document.querySelector('[data-score-card="roteiro"]'), rot);
+      applyScoreStyle(document.querySelector('[data-score-card="experiencia"]'), exp);
+
+      const durMinutes = parseDurationMinutes(metrics.duracao);
+      const maxRef = 15;
+      const durPercent = Math.max(0, Math.min(100, (durMinutes / maxRef) * 100));
+      const barDur = document.getElementById("bar_duracao");
+      if (barDur) barDur.style.width = durPercent + "%";
+      const lblDur = document.getElementById("bar_duracao_label");
+      if (lblDur) {
+        lblDur.textContent = durMinutes ? durMinutes.toFixed(1).replace(".", ",") : "0";
+      }
+    }
+
+    function getHistoryFromStorage() {
+      try {
+        const raw = localStorage.getItem(HISTORY_KEY);
+        return raw ? JSON.parse(raw) : [];
+      } catch {
+        return [];
+      }
+    }
+
+    function saveHistory(history) {
+      try {
+        localStorage.setItem(HISTORY_KEY, JSON.stringify(history));
+      } catch {}
+    }
+
+    function renderHistory(history) {
+      const table = document.getElementById("historyTable");
+      if (!table) return;
+      table.innerHTML = "";
+
+      if (!history || !history.length) {
+        table.innerHTML = '<div class="history-empty">Ainda não há histórico suficiente para exibir.</div>';
+        return;
+      }
+
+      const header = document.createElement("div");
+      header.className = "history-row history-header-row";
+      header.innerHTML = "<span>Data</span><span>Agente</span><span>Score</span><span>CPC</span>";
+      table.appendChild(header);
+
+      history.forEach((item) => {
+        const row = document.createElement("div");
+        row.className = "history-row";
+
+        let dateLabel = "–";
+        try {
+          const d = new Date(item.created_at || item.data || "");
+          dateLabel = d.toLocaleString("pt-BR", { dateStyle: "short", timeStyle: "short" });
+        } catch {
+          dateLabel = item.created_at || "–";
+        }
+
+        const scoreLabel = item.score ?? "–";
+        const cpcRaw = String(item.cpc ?? "nao_identificado").toLowerCase();
+        let cpcLabel = "Indefinido";
+        if (cpcRaw === "true") cpcLabel = "CPC";
+        else if (cpcRaw === "false") cpcLabel = "Não CPC";
+
+        row.innerHTML = `
+          <span>${dateLabel}</span>
+          <span>${formatLabel(item.agente || "nao_identificado")}</span>
+          <span>${scoreLabel}</span>
+          <span>${cpcLabel}</span>
+        `;
+        table.appendChild(row);
+      });
+    }
+
+    function updateDonut(history) {
+      const donut = document.getElementById("donut_cpc");
+      const lblCenter = document.getElementById("donut_center_label");
+      const lblCpc = document.getElementById("donut_cpc_label");
+      const lblNcpc = document.getElementById("donut_ncpc_label");
+      if (!donut || !lblCenter || !lblCpc || !lblNcpc) return;
+
+      if (!history || !history.length) {
+        donut.style.setProperty("--cpc-stop", "0%");
+        lblCenter.textContent = "–";
+        lblCpc.textContent = "CPC: 0%";
+        lblNcpc.textContent = "Não CPC / ind.: 100%";
+        return;
+      }
+
+      let cpcCount = 0;
+      let total = 0;
+
+      history.forEach((h) => {
+        const v = String(h.cpc || "").toLowerCase();
+        if (v === "true") {
+          cpcCount++;
+          total++;
+        } else if (v === "false") {
+          total++;
+        }
+      });
+
+      if (!total) {
+        donut.style.setProperty("--cpc-stop", "0%");
+        lblCenter.textContent = "–";
+        lblCpc.textContent = "CPC: 0%";
+        lblNcpc.textContent = "Não CPC / ind.: 100%";
+        return;
+      }
+
+      const cpcPct = Math.round((cpcCount / total) * 100);
+      const ncpcPct = 100 - cpcPct;
+
+      donut.style.setProperty("--cpc-stop", cpcPct + "%");
+      lblCenter.textContent = cpcPct + "%";
+      lblCpc.textContent = `CPC: ${cpcPct}%`;
+      lblNcpc.textContent = `Não CPC / ind.: ${ncpcPct}%`;
+    }
+
+    function setAgentBadge(history, agenteAtual) {
+      const badge = document.getElementById("agente_badge");
+      if (!badge) return;
+
+      badge.style.display = "none";
+      badge.className = "agent-badge";
+      badge.textContent = "";
+
+      if (!agenteAtual || agenteAtual === "nao_identificado") return;
+      if (!history || !history.length) return;
+
+      const scoresAll = history
+        .map((h) => Number(h.score))
+        .filter((n) => !isNaN(n));
+      if (!scoresAll.length) return;
+
+      const avgAll = scoresAll.reduce((a, b) => a + b, 0) / scoresAll.length;
+
+      const own = history.filter(
+        (h) => String(h.agente || "").toLowerCase() === String(agenteAtual).toLowerCase()
+      );
+      const ownScores = own.map((h) => Number(h.score)).filter((n) => !isNaN(n));
+      if (!ownScores.length) return;
+
+      const avgOwn = ownScores.reduce((a, b) => a + b, 0) / ownScores.length;
+
+      let label = "";
+      let cls = "agent-badge--mid";
+
+      if (avgOwn >= avgAll + 5) {
+        label = "Top performer (últimas ligações)";
+        cls = "agent-badge--top";
+      } else if (avgOwn <= avgAll - 5) {
+        label = "Abaixo da média recente";
+        cls = "agent-badge--low";
+      } else {
+        label = "Dentro da média recente";
+        cls = "agent-badge--mid";
+      }
+
+      badge.textContent = label;
+      badge.classList.add(cls);
+      badge.style.display = "inline-flex";
+    }
+
+    function updateHistory(registroAtual) {
+      if (!registroAtual) return;
+      const history = getHistoryFromStorage();
+
+      const newEntry = {
+        created_at: registroAtual.created_at || new Date().toISOString(),
+        agente: registroAtual.agente || "nao_identificado",
+        score: registroAtual.score || "0",
+        cpc: registroAtual.cpc || "nao_identificado"
+      };
+
+      history.unshift(newEntry);
+      const trimmed = history.slice(0, 5);
+      saveHistory(trimmed);
+      renderHistory(trimmed);
+      updateDonut(trimmed);
+      setAgentBadge(trimmed, newEntry.agente);
+    }
+
+    function realcarTrechoReferencia(texto) {
+      if (!texto) return "";
+      const markers = ["Trecho de referência:", "Trechos-chave:"];
+      let marker = null;
+      let idx = -1;
+
+      for (const m of markers) {
+        const pos = texto.indexOf(m);
+        if (pos !== -1) {
+          marker = m;
+          idx = pos;
+          break;
+        }
+      }
+
+      if (marker === null) return texto;
+
+      const antes = texto.slice(0, idx);
+      const depois = texto.slice(idx + marker.length).trim();
+
+      return `${antes}<span class="highlight-snippet">${marker} ${depois}</span>`;
+    }
+
+    function buildFlatReport() {
+      if (!lastAnalysis) return null;
+
+      return {
+        Data_analise: lastAnalysis.created_at || "",
+        Id_chamada: lastAnalysis.id || "",
+        Telefone: lastAnalysis.telefone || "",
+        Agente: formatLabel(lastAnalysis.agente || "nao_identificado"),
+        Cliente: formatLabel(lastAnalysis.cliente || "nao_identificado"),
+        Operacao: lastAnalysis.operacao || lastAnalysis.tipo_operacao_detectada || "",
+        Score_geral: lastAnalysis.score || "",
+        Score_roteiro: lastAnalysis.score_roteiro || "",
+        Score_experiencia: lastAnalysis.score_experiencia || "",
+        CPC: lastAnalysis.cpc || "",
+        Duracao: lastAnalysis.duracao || "",
+        Emocao_cliente: formatLabel(lastAnalysis.emocao_cliente || ""),
+        Postura_agente: formatLabel(lastAnalysis.postura_agente || ""),
+        Pontos_positivos: lastAnalysis.pontos_positivos || "",
+        Pontos_melhoria: lastAnalysis.pontos_melhoria || "",
+        Resumo_tecnico: lastAnalysis.resumo || lastAnalysis.observacoes_gerais || ""
+      };
+    }
+
+    function exportCsv() {
+      const row = buildFlatReport();
+      if (!row) {
+        setStatus("Nenhuma análise carregada para exportar.", "error");
+        return;
+      }
+
+      const headers = Object.keys(row);
+      const values = headers.map((k) =>
+        `"${String(row[k]).replace(/"/g, '""').replace(/\r?\n/g, " ")}"`
+      );
+
+      const csv = headers.join(";") + "\n" + values.join(";");
+      const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = "relatorio_monitoria.csv";
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      URL.revokeObjectURL(url);
+    }
+
+    function exportExcel() {
+      const row = buildFlatReport();
+      if (!row) {
+        setStatus("Nenhuma análise carregada para exportar.", "error");
+        return;
+      }
+
+      const headers = Object.keys(row);
+      const values = headers.map((k) => String(row[k]).replace(/\r?\n/g, " "));
+
+      let table = "<table border='1'><thead><tr>";
+      headers.forEach((h) => {
+        table += `<th style="background:#111827;color:#e5e7eb;padding:4px 6px;font-size:11px;">${h}</th>`;
+      });
+      table += "</tr></thead><tbody><tr>";
+      values.forEach((v) => {
+        table += `<td style="padding:4px 6px;font-size:11px;">${v}</td>`;
+      });
+      table += "</tr></tbody></table>";
+
+      const blob = new Blob(["\ufeff" + table], {
+        type: "application/vnd.ms-excel;charset=utf-8;"
+      });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = "relatorio_monitoria.xls";
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      URL.revokeObjectURL(url);
+    }
+
+    function exportPdf() {
+      const row = buildFlatReport();
+      if (!row) {
+        setStatus("Nenhuma análise carregada para exportar.", "error");
+        return;
+      }
+
+      const headers = Object.keys(row);
+      const values = headers.map((k) => String(row[k]));
+
+      const win = window.open("", "_blank");
+      if (!win) return;
+
+      win.document.write(`
+        <!DOCTYPE html>
+        <html lang="pt-BR">
+        <head>
+          <meta charset="UTF-8" />
+          <title>Relatório Monitoria IA</title>
+          <style>
+            body { font-family: system-ui, -apple-system, "Segoe UI", sans-serif; padding:20px; color:#111827; }
+            h1 { font-size:18px; margin-bottom:6px; }
+            h2 { font-size:13px; margin:0 0 12px; color:#4b5563; }
+            table { border-collapse: collapse; width:100%; font-size:11px; }
+            th, td { border:1px solid #9ca3af; padding:5px 6px; vertical-align:top; }
+            th { background:#111827; color:#f9fafb; text-align:left; }
+          </style>
+        </head>
+        <body>
+          <h1>Relatório de Monitoria - Atlas IA</h1>
+          <h2>Grupo Asserth</h2>
+          <table>
+            <thead>
+              <tr>${headers.map(h => `<th>${h}</th>`).join("")}</tr>
+            </thead>
+            <tbody>
+              <tr>${values.map(v => `<td>${v.replace(/\r?\n/g,"<br>")}</td>`).join("")}</tr>
+            </tbody>
+          </table>
+        </body>
+        </html>
+      `);
+
+      win.document.close();
+      win.focus();
+      win.print();
+    }
+
+    if (btnExportCsv) btnExportCsv.addEventListener("click", exportCsv);
+    if (btnExportExcel) btnExportExcel.addEventListener("click", exportExcel);
+    if (btnExportPdf) btnExportPdf.addEventListener("click", exportPdf);
+
+    async function carregarUltimaAnalise(manual = false) {
+      try {
+        if (manual) {
+          setStatus("Buscando última análise na IA...", "neutral");
+        }
+
+        const res = await fetch(N8N_WEBHOOK_GET_ULTIMA, { method: "GET" });
+
+        if (!res.ok) {
+          throw new Error(`HTTP ${res.status}`);
+        }
+
+        const dados = await res.json();
+
+        const registro =
+          Array.isArray(dados) && dados.length > 0
+            ? dados[0]
+            : dados;
+
+        lastAnalysis = registro || null;
+
+        const get = (k, def = "–") => {
+          if (!registro) return def;
+          const v = registro[k];
+          if (v === null || v === undefined || v === "") return def;
+          return String(v);
+        };
+
+        document.getElementById("agente_nome").textContent = formatLabel(get("agente"));
+        document.getElementById("cliente_nome").textContent = formatLabel(get("cliente"));
+
+        const cpcBruto = get("cpc");
+        let cpcTexto = "–";
+        if (["TRUE", "true", true].includes(cpcBruto)) {
+          cpcTexto = "Contato efetivo (CPC)";
+        } else if (["FALSE", "false", false].includes(cpcBruto)) {
+          cpcTexto = "Sem contato (não CPC)";
+        } else if (cpcBruto !== "–") {
+          cpcTexto = cpcBruto;
+        }
+        document.getElementById("cpc_valor").textContent = cpcTexto;
+
+        const duracaoLabel = get("duracao");
+        document.getElementById("duracao_valor").textContent = duracaoLabel;
+        document.getElementById("emocao_cliente_valor").textContent = formatLabel(get("emocao_cliente"));
+        document.getElementById("postura_agente_valor").textContent = formatLabel(get("postura_agente"));
+
+        const scoreGeral = get("score");
+        const scoreRoteiro = get("score_roteiro");
+        const scoreExp = get("score_experiencia");
+
+        document.getElementById("score_geral").textContent = scoreGeral;
+        document.getElementById("score_roteiro_valor").textContent = scoreRoteiro;
+        document.getElementById("score_experiencia_valor").textContent = scoreExp;
+
+        document.getElementById("pontos_positivos_texto").innerHTML =
+          realcarTrechoReferencia(get("pontos_positivos", "Sem pontos positivos destacados."));
+
+        document.getElementById("pontos_melhoria_texto").innerHTML =
+          realcarTrechoReferencia(get("pontos_melhoria", "Sem pontos de melhoria destacados."));
+
+        document.getElementById("resumo_tecnico_texto").innerHTML =
+          realcarTrechoReferencia(get("resumo", "Análise realizada sem observações adicionais."));
+
+        document.getElementById("tipo_operacao_valor").textContent =
+          get("operacao", "–");
+
+        const created = get("created_at", "");
+        if (created && created !== "–") {
+          try {
+            const d = new Date(created);
+            document.getElementById("lastUpdated").textContent =
+              d.toLocaleString("pt-BR", { dateStyle: "short", timeStyle: "medium" });
+          } catch {
+            document.getElementById("lastUpdated").textContent = created;
+          }
+        } else {
+          document.getElementById("lastUpdated").textContent = "–";
+        }
+
+        // TRANSCRIÇÃO COMPLETA (agora olhando também para o campo texto)
+        let transcricaoCompleta = "";
+
+        if (registro && registro.texto) {
+          transcricaoCompleta = String(registro.texto);
+        } else {
+          transcricaoCompleta =
+            get("transcricao_completa", "") ||
+            get("transcricao", "") ||
+            get("transcript", "") ||
+            get("texto_transcricao", "");
+        }
+
+        if (transcricaoTextoEl) {
+          if (transcricaoCompleta && transcricaoCompleta !== "–") {
+            transcricaoTextoEl.textContent = transcricaoCompleta;
+          } else {
+            transcricaoTextoEl.textContent = "Transcrição não disponível para esta ligação.";
+          }
+        }
+
+        transcriptionVisible = false;
+        if (transcriptionSection) {
+          transcriptionSection.classList.add("collapsed");
+        }
+
+        updateCharts({
+          score: scoreGeral,
+          score_roteiro: scoreRoteiro,
+          score_experiencia: scoreExp,
+          duracao: duracaoLabel
+        });
+
+        updateHistory(registro);
+
+        if (manual) {
+          setStatus("Última análise carregada com sucesso.", "success");
+        }
+      } catch (err) {
+        console.error(err);
+        if (manual) {
+          setStatus("Não foi possível buscar a última análise: " + (err.message || "erro"), "error");
+        }
+      }
+    }
+
+    refreshBtn.addEventListener("click", () => carregarUltimaAnalise(true));
+
+    const initialHistory = getHistoryFromStorage();
+    renderHistory(initialHistory);
+    updateDonut(initialHistory);
+
+    carregarUltimaAnalise(false);
+  </script>
+</body>
+</html>
