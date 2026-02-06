@@ -1442,9 +1442,60 @@
       return `${antes}<span class="highlight-snippet">${marker} ${depois}</span>`;
     }
 
-    // ✅ AJUSTE: exportação também pega ponto de atenção
+    // ✅ GLOBAL: leitura robusta por chave "normalizada"
+    function normalizeKey(k) {
+      return String(k || "")
+        .toLowerCase()
+        .normalize("NFD").replace(/[\u0300-\u036f]/g, "")
+        .replace(/[^a-z0-9]/g, "");
+    }
+
+    function getByNormalizedKey(obj, wantedNormalizedKey, def = "") {
+      if (!obj || typeof obj !== "object") return def;
+
+      const target = normalizeKey(wantedNormalizedKey);
+
+      // 1) chaves no 1º nível
+      for (const k of Object.keys(obj)) {
+        if (normalizeKey(k) === target) {
+          const v = obj[k];
+          if (v === null || v === undefined || v === "") return def;
+          return String(v);
+        }
+      }
+
+      // 2) fallback: 1 nível interno
+      for (const k of Object.keys(obj)) {
+        const v = obj[k];
+        if (v && typeof v === "object" && !Array.isArray(v)) {
+          for (const kk of Object.keys(v)) {
+            if (normalizeKey(kk) === target) {
+              const vv = v[kk];
+              if (vv === null || vv === undefined || vv === "") return def;
+              return String(vv);
+            }
+          }
+        }
+      }
+
+      return def;
+    }
+
+    // ✅ AJUSTE: exportação também pega ponto de atenção (robusto)
     function buildFlatReport() {
       if (!lastAnalysis) return null;
+
+      const pontoAtencao =
+        getByNormalizedKey(lastAnalysis, "ponto_de_atencao", "") ||
+        getByNormalizedKey(lastAnalysis, "ponto de atencao", "") ||
+        getByNormalizedKey(lastAnalysis, "ponto_atencao", "") ||
+        getByNormalizedKey(lastAnalysis, "pontoatencao", "");
+
+      const pontoAtencaoTrecho =
+        getByNormalizedKey(lastAnalysis, "ponto_de_atencao_trecho", "") ||
+        getByNormalizedKey(lastAnalysis, "ponto de atencao trecho", "") ||
+        getByNormalizedKey(lastAnalysis, "ponto_atencao_trecho", "") ||
+        getByNormalizedKey(lastAnalysis, "pontoatencaotrecho", "");
 
       return {
         Data_analise: lastAnalysis.created_at || "",
@@ -1462,8 +1513,8 @@
         Postura_agente: formatLabel(lastAnalysis.postura_agente || ""),
         Pontos_positivos: lastAnalysis.pontos_positivos || "",
         Pontos_melhoria: lastAnalysis.pontos_melhoria || "",
-        Ponto_atencao: lastAnalysis.ponto_de_atencao || lastAnalysis.ponto_atencao || "",
-        Ponto_atencao_trecho: lastAnalysis.ponto_de_atencao_trecho || lastAnalysis.ponto_atencao_trecho || "",
+        Ponto_atencao: pontoAtencao || "",
+        Ponto_atencao_trecho: pontoAtencaoTrecho || "",
         Resumo_tecnico: lastAnalysis.resumo || lastAnalysis.observacoes_gerais || ""
       };
     }
@@ -1583,45 +1634,6 @@
           return String(v);
         };
 
-        // ✅ NOVO: leitura robusta por chave "normalizada" (aceita espaço, acento, underline, etc.)
-        function normalizeKey(k) {
-          return String(k || "")
-            .toLowerCase()
-            .normalize("NFD").replace(/[\u0300-\u036f]/g, "")
-            .replace(/[^a-z0-9]/g, "");
-        }
-
-        function getByNormalizedKey(obj, wantedNormalizedKey, def = "") {
-          if (!obj || typeof obj !== "object") return def;
-
-          const target = normalizeKey(wantedNormalizedKey);
-
-          // 1) chaves no 1º nível
-          for (const k of Object.keys(obj)) {
-            if (normalizeKey(k) === target) {
-              const v = obj[k];
-              if (v === null || v === undefined || v === "") return def;
-              return String(v);
-            }
-          }
-
-          // 2) fallback: 1 nível interno (caso venha nested)
-          for (const k of Object.keys(obj)) {
-            const v = obj[k];
-            if (v && typeof v === "object" && !Array.isArray(v)) {
-              for (const kk of Object.keys(v)) {
-                if (normalizeKey(kk) === target) {
-                  const vv = v[kk];
-                  if (vv === null || vv === undefined || vv === "") return def;
-                  return String(vv);
-                }
-              }
-            }
-          }
-
-          return def;
-        }
-
         document.getElementById("agente_nome").textContent = formatLabel(get("agente"));
         document.getElementById("cliente_nome").textContent = formatLabel(get("cliente"));
 
@@ -1654,7 +1666,7 @@
         document.getElementById("resumo_tecnico_texto").innerHTML =
           realcarTrechoReferencia(get("resumo", "Análise realizada sem observações adicionais."));
 
-        // ✅ PONTO DE ATENÇÃO (agora 100% robusto)
+        // ✅ PONTO DE ATENÇÃO (robusto)
         const pontoBloco = document.getElementById("ponto_atencao_bloco");
         const pontoTexto = document.getElementById("ponto_atencao_texto");
         const trechoWrap = document.getElementById("ponto_atencao_trecho_wrap");
@@ -1756,6 +1768,3 @@
   </script>
 </body>
 </html>
-
-
-
